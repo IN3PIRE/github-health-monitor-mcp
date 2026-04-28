@@ -1,31 +1,28 @@
 {
   "name": "github-health-monitor",
   "version": "1.0.0",
-  "description": "MCP server for monitoring GitHub repository health metrics",
   "type": "module",
+  "description": "MCP server for monitoring GitHub repository health metrics",
   "main": "dist/index.js",
+  "bin": {
+    "github-health-monitor": "./dist/index.js"
+  },
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "tsc --watch",
-    "clean": "rm -rf dist"
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js"
   },
-  "keywords": [
-    "mcp",
-    "github",
-    "health",
-    "monitoring"
-  ],
-  "author": "IN3PIRE",
+  "keywords": ["mcp", "github", "health", "monitoring"],
+  "author": "",
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^0.4.0"
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@octokit/rest": "^21.0.0",
+    "@octokit/graphql": "^8.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
-    "typescript": "^5.3.0"
-  },
-  "engines": {
-    "node": ">=18.0.0"
+    "typescript": "^5.0.0",
+    "tsx": "^4.0.0"
   }
 }
