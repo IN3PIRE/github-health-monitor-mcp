@@ -3,13 +3,13 @@ import {
   GitHub____list_pull_requests____mcp,
   GitHub____search_issues____mcp,
   GitHub____get_commit____mcp
-} from '../mcp-github-wrapper.js';
+} from './mcp-github-wrapper.js';
+import { collectSecurityAlerts } from './security-monitor.js';
 import { 
   RepoHealth, 
   BranchInfo, 
   PullRequestInfo, 
   IssueInfo, 
-  SecurityAlert,
   HealthConfig
 } from './types.js';
 import { daysBetween } from './utils.js';
@@ -21,13 +21,14 @@ export async function collectHealthData(
 ): Promise<RepoHealth> {
   const now = new Date().toISOString();
   
-  const [branches, prs, issues] = await Promise.all([
+  const [branches, prs, issues, securityAlerts] = await Promise.all([
     GitHub____list_branches____mcp({ owner, repo, perPage: 100 }),
     GitHub____list_pull_requests____mcp({ owner, repo, state: 'open', perPage: 100 }),
     GitHub____search_issues____mcp({
       query: `repo:${owner}/${repo} is:issue is:open`,
       perPage: 100
-    })
+    }),
+    collectSecurityAlerts(owner, repo, config)
   ]);
 
   const staleBranches: BranchInfo[] = [];
@@ -69,8 +70,6 @@ export async function collectHealthData(
       daysSinceUpdate: daysBetween(issue.updated_at, now),
       assignee: issue.assignee?.login
     }));
-
-  const securityAlerts: SecurityAlert[] = [];
 
   return {
     staleBranches,
