@@ -5,14 +5,11 @@ import {
   GitHub____get_commit____mcp
 } from './mcp-github-wrapper.js';
 import { collectSecurityAlerts } from './security-monitor.js';
-import { 
-  RepoHealth, 
-  BranchInfo, 
-  PullRequestInfo, 
-  IssueInfo, 
+import {
+  RepoHealth,
   HealthConfig
 } from './types.js';
-import { daysBetween } from './utils.js';
+import { deriveHealthFindings, BranchCommitInfo } from './health-calculations.js';
 
 export async function collectHealthData(
   owner: string, 
@@ -31,50 +28,40 @@ export async function collectHealthData(
     collectSecurityAlerts(owner, repo, config)
   ]);
 
-  const staleBranches: BranchInfo[] = [];
+  const branchCommits: BranchCommitInfo[] = [];
   for (const branch of branches) {
     try {
-      const commit = await GitHub____get_commit____mcp({ 
-        owner, 
-        repo, 
-        sha: branch.commit.sha 
+      const commit = await GitHub____get_commit____mcp({
+        owner,
+        repo,
+        sha: branch.commit.sha
       });
-      
-      const daysStale = daysBetween(commit.commit.author.date, now);
-      if (daysStale > config.staleBranchDays) {
-        staleBranches.push({
-          name: branch.name,
-          lastCommit: commit.commit.author.date,
-          daysStale
-        });
+
+      const authorDate = commit.commit.author?.date ?? commit.commit.committer?.date;
+      if (!authorDate) {
+        console.warn(`Commit ${branch.commit.sha} for branch ${branch.name} has no author or committer date`);
+        continue;
       }
+
+      branchCommits.push({
+        name: branch.name,
+        lastCommit: authorDate
+      });
     } catch (error) {
       console.error(`Failed to get commit for branch ${branch.name}:`, error);
     }
   }
 
-  const oldPRs: PullRequestInfo[] = prs
-    .filter(pr => daysBetween(pr.created_at, now) > config.oldPRDays)
-    .map(pr => ({
-      number: pr.number,
-      title: pr.title,
-      daysOpen: daysBetween(pr.created_at, now),
-      author: pr.user.login
-    }));
-
-  const unresponsiveIssues: IssueInfo[] = issues.items
-    .filter(issue => daysBetween(issue.updated_at, now) > config.unresponsiveIssueDays)
-    .map(issue => ({
-      number: issue.number,
-      title: issue.title,
-      daysSinceUpdate: daysBetween(issue.updated_at, now),
-      assignee: issue.assignee?.login
-    }));
+  const findings = deriveHealthFindings({
+    branchCommits,
+    pullRequests: prs,
+    issues: issues.items,
+    config,
+    now
+  });
 
   return {
-    staleBranches,
-    oldPRs,
-    unresponsiveIssues,
+    ...findings,
     securityAlerts,
     timestamp: now
   };
