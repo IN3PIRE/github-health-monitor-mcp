@@ -85,9 +85,19 @@ export async function GitHub____get_security_alerts____mcp({
 }: {
  owner: string;
   repo: string;
-}) {
+}): Promise<Array<{ package: string; severity: 'critical' | 'high' | 'medium' | 'low'; createdAt: string }>> {
   try {
-    const { repository } = await graphqlWithAuth(`
+    const response = await graphqlWithAuth<{
+      repository: {
+        vulnerabilityAlerts: {
+          nodes: Array<{
+            vulnerableManifestPath: string;
+            securityAdvisory: { severity: string };
+            createdAt: string;
+          }>;
+        };
+      };
+    }>(`
       query($owner: String!, $repo: String!) {
         repository(owner: $owner, name: $repo) {
           vulnerabilityAlerts(first: 100) {
@@ -105,11 +115,16 @@ export async function GitHub____get_security_alerts____mcp({
       }
     `, { owner, repo });
     
-    return repository.vulnerabilityAlerts.nodes.map((alert: any) => ({
-      package: alert.vulnerableManifestPath,
-      severity: alert.securityAdvisory.severity.toLowerCase(),
-      createdAt: alert.createdAt
-    }));
+    return response.repository.vulnerabilityAlerts.nodes.map((alert) => {
+      const severity = alert.securityAdvisory.severity.toLowerCase();
+      return {
+        package: alert.vulnerableManifestPath,
+        severity: severity === 'critical' || severity === 'high' || severity === 'medium' || severity === 'low'
+          ? severity
+          : 'low',
+        createdAt: alert.createdAt
+      };
+    });
   } catch (error) {
     console.warn('Security alerts not available (requires GitHub Advanced Security)');
     return [];
