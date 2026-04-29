@@ -21,7 +21,7 @@ npm install
 npm run build
 
 # Configure in MCP client
-# Add to your MCP config:
+# See examples/ for ready-to-copy configs:
 {
   "mcpServers": {
     "github-health": {
@@ -31,6 +31,8 @@ npm run build
   }
 }
 ```
+
+More client configuration examples are available in [examples/](examples/).
 
 ## 🔧 Configuration
 

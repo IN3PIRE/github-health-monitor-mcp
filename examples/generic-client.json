@@ -1,0 +1,15 @@
+{
+  "name": "github-health-monitor",
+  "transport": {
+    "type": "stdio",
+    "command": "node",
+    "args": ["/absolute/path/to/github-health-monitor/dist/index.js"],
+    "env": {
+      "GITHUB_TOKEN": "ghp_replace_with_your_token",
+      "STALE_BRANCH_DAYS": "30",
+      "OLD_PR_DAYS": "14",
+      "UNRESPONSIVE_ISSUE_DAYS": "7"
+    }
+  },
+  "tools": ["check_health"]
+}
