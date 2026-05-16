@@ -254,10 +254,11 @@ pm2 start dist/index.js --name "github-health-monitor"
 
 **Rate Limiting**
 ```
-Error: API rate limit exceeded
+GitHub API rate limit exceeded. Retry after about 60 seconds. Set GITHUB_TOKEN for a higher request limit.
 ```
 - **Solution**: Set `GITHUB_TOKEN` environment variable for 5,000 req/hour limit (vs 60 for unauthenticated)
 - **Token**: Generate at [github.com/settings/tokens](https://github.com/settings/tokens) with `repo` scope
+- **Behavior**: Short retry windows are retried with exponential backoff. Longer GitHub reset windows are returned as a clear health-check error with the retry time.
 
 **Connection Issues**
 ```
