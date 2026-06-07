@@ -1,5 +1,6 @@
 import { Octokit } from '@octokit/rest';
 import { graphql } from '@octokit/graphql';
+import { runGitHubRequest } from './github-rate-limit.js';
 
 const octokit = new Octokit({
  auth: process.env.GITHUB_TOKEN
@@ -20,11 +21,11 @@ export async function GitHub____list_branches____mcp({
  repo: string;
  perPage?: number;
 }) {
- const { data } = await octokit.repos.listBranches({
- owner,
- repo,
- per_page: perPage
- });
+ const { data } = await runGitHubRequest(() => octokit.repos.listBranches({
+  owner,
+  repo,
+  per_page: perPage
+ }));
  return data;
 }
 
@@ -39,12 +40,12 @@ export async function GitHub____list_pull_requests____mcp({
  state?: 'open' | 'closed' | 'all';
  perPage?: number;
 }) {
- const { data } = await octokit.pulls.list({
- owner,
- repo,
- state,
- per_page: perPage
- });
+ const { data } = await runGitHubRequest(() => octokit.pulls.list({
+  owner,
+  repo,
+  state,
+  per_page: perPage
+ }));
  return data;
 }
 
@@ -55,10 +56,10 @@ export async function GitHub____search_issues____mcp({
  query: string;
   perPage?: number;
 }) {
- const { data } = await octokit.search.issuesAndPullRequests({
- q: query,
- per_page: perPage
- });
+ const { data } = await runGitHubRequest(() => octokit.search.issuesAndPullRequests({
+  q: query,
+  per_page: perPage
+ }));
  return data;
 }
 
@@ -71,11 +72,11 @@ export async function GitHub____get_commit____mcp({
  repo: string;
  sha: string;
 }) {
- const { data } = await octokit.repos.getCommit({
- owner,
- repo,
- ref: sha
- });
+ const { data } = await runGitHubRequest(() => octokit.repos.getCommit({
+  owner,
+  repo,
+  ref: sha
+ }));
  return data;
 }
 
@@ -87,7 +88,7 @@ export async function GitHub____get_security_alerts____mcp({
   repo: string;
 }): Promise<Array<{ package: string; severity: 'critical' | 'high' | 'medium' | 'low'; createdAt: string }>> {
   try {
-    const response = await graphqlWithAuth<{
+    const response = await runGitHubRequest(() => graphqlWithAuth<{
       repository: {
         vulnerabilityAlerts: {
           nodes: Array<{
@@ -113,7 +114,7 @@ export async function GitHub____get_security_alerts____mcp({
           }
         }
       }
-    `, { owner, repo });
+    `, { owner, repo }));
     
     return response.repository.vulnerabilityAlerts.nodes.map((alert) => {
       const severity = alert.securityAdvisory.severity.toLowerCase();
