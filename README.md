@@ -386,3 +386,10 @@ Click 👀 **Watch** → **Releases only** to get notified about new versions an
 **Built with ❤️ for the MCP ecosystem.**
 
 ⭐ **Don't forget to star the repo to enable PR merging and show your support!**
+
+## Additional Information
+
+- **Offers Easy Installation**: Install via the LobeHub badge or a single `npm install` command; no complex manual setup required.
+- **Has LICENSE**: The repository includes an MIT LICENSE file.
+- **Includes Prompts**: Ready‑to‑use prompts are bundled for easy integration with MCP clients.
+- **Includes Resources**: Example configurations, schemas, and context resources are provided in the `examples/` folder.
