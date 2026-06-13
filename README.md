@@ -1,5 +1,7 @@
 # GitHub Health Monitor MCP
 
+[![MCP Badge](https://lobehub.com/badge/mcp/in3pire-github-health-monitor-mcp)](https://lobehub.com/mcp/in3pire-github-health-monitor-mcp)
+
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-20+-green.svg)](https://nodejs.org/)
 [![MCP SDK](https://img.shields.io/badge/MCP%20SDK-1.0+-orange.svg)](https://github.com/modelcontextprotocol/typescript-sdk)
