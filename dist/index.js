@@ -3,6 +3,7 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { collectHealthData } from './health-monitor.js';
+import { formatGitHubApiError } from './github-rate-limit.js';
 import { getConfig, formatHealthSummary } from './utils.js';
 const server = new Server({
     name: 'github-health-monitor',
@@ -61,7 +62,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
     }
     catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage = formatGitHubApiError(error);
         return {
             content: [
                 {
@@ -81,3 +82,4 @@ main().catch((error) => {
     console.error('Fatal error:', error);
     process.exit(1);
 });
+//# sourceMappingURL=index.js.map

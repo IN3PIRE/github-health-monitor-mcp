@@ -1,5 +1,5 @@
 import { Octokit } from 'octokit';
-import { BusFactorAnalysis, CriticalContributor } from './types';
+import { BusFactorAnalysis, CriticalContributor } from './types.js';
 
 export class BusFactorAnalyzer {
   private octokit: Octokit;
@@ -16,7 +16,7 @@ export class BusFactorAnalyzer {
     const { data: contributors } = await this.octokit.rest.repos.listContributors({
       owner,
       repo,
-      anon: false,
+      anon: 'false',
       per_page: 100
     });
 

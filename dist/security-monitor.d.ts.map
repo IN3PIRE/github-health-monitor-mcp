@@ -1,0 +1,1 @@
+{"version":3,"file":"security-monitor.d.ts","sourceRoot":"","sources":["../src/security-monitor.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,aAAa,EAAE,YAAY,EAAE,MAAM,YAAY,CAAC;AAGzD,wBAAsB,qBAAqB,CAC1C,KAAK,EAAE,MAAM,EACb,IAAI,EAAE,MAAM,EACZ,MAAM,EAAE,YAAY,GAClB,OAAO,CAAC,aAAa,EAAE,CAAC,CAe1B"}

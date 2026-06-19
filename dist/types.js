@@ -3,3 +3,4 @@ export const DEFAULT_CONFIG = {
     oldPRDays: 14,
     unresponsiveIssueDays: 7
 };
+//# sourceMappingURL=types.js.map

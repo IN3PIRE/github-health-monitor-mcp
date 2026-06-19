@@ -17,17 +17,23 @@
     "test": "npm run build && node --test test/*.test.mjs",
     "start": "node dist/index.js"
   },
-  "keywords": ["mcp", "github", "health", "monitoring"],
+  "keywords": [
+    "mcp",
+    "github",
+    "health",
+    "monitoring"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
+    "@octokit/graphql": "^8.0.0",
     "@octokit/rest": "^21.0.0",
-    "@octokit/graphql": "^8.0.0"
+    "octokit": "5.0.5"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
-    "typescript": "^5.0.0",
-    "tsx": "^4.0.0"
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
   }
 }
