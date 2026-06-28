@@ -3,8 +3,8 @@ import {
   ContributorActivitySummary, 
   TopContributor, 
   ActivityBucket 
-} from './types';
-import { getDaysAgoDate } from './utils';
+} from './types.js';
+import { getDaysAgoDate } from './utils.js';
 
 export class ContributorActivityTracker {
   private octokit: Octokit;
@@ -54,7 +54,7 @@ export class ContributorActivityTracker {
         }
         contributorMap.get(author).commits90Days++;
         
-        if (new Date(commit.commit.author.date) >= thirtyDaysAgo) {
+        if (commit.commit.author?.date && new Date(commit.commit.author.date) >= thirtyDaysAgo) {
           contributorMap.get(author).commits30Days++;
         }
       }

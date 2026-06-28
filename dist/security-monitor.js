@@ -15,3 +15,4 @@ export async function collectSecurityAlerts(owner, repo, config) {
         return [];
     }
 }
+//# sourceMappingURL=security-monitor.js.map

@@ -1,10 +1,28 @@
 import { DEFAULT_CONFIG } from './types.js';
+function parsePositiveInt(value, fallback, label) {
+    if (value === undefined)
+        return fallback;
+    const trimmed = value.trim();
+    if (trimmed === '')
+        return fallback;
+    const parsed = Number(trimmed);
+    if (!Number.isInteger(parsed) || parsed < 1) {
+        throw new RangeError(`${label} must be a positive integer, got "${trimmed}"`);
+    }
+    return parsed;
+}
 export function getConfig() {
     return {
-        staleBranchDays: parseInt(process.env.STALE_BRANCH_DAYS || '30'),
-        oldPRDays: parseInt(process.env.OLD_PR_DAYS || '14'),
-        unresponsiveIssueDays: parseInt(process.env.UNRESPONSIVE_ISSUE_DAYS || '7')
+        staleBranchDays: parsePositiveInt(process.env.STALE_BRANCH_DAYS, DEFAULT_CONFIG.staleBranchDays, 'STALE_BRANCH_DAYS'),
+        oldPRDays: parsePositiveInt(process.env.OLD_PR_DAYS, DEFAULT_CONFIG.oldPRDays, 'OLD_PR_DAYS'),
+        unresponsiveIssueDays: parsePositiveInt(process.env.UNRESPONSIVE_ISSUE_DAYS, DEFAULT_CONFIG.unresponsiveIssueDays, 'UNRESPONSIVE_ISSUE_DAYS')
     };
+}
+export function getDaysAgoDate(days) {
+    const date = new Date();
+    date.setDate(date.getDate() - days);
+    date.setHours(0, 0, 0, 0);
+    return date;
 }
 export function daysBetween(date1, date2) {
     const d1 = new Date(date1).getTime();
@@ -18,3 +36,4 @@ export function formatHealthSummary(health) {
 - Unresponsive issues: ${health.unresponsiveIssues.length}
 - Security alerts: ${health.securityAlerts.length}`;
 }
+//# sourceMappingURL=utils.js.map

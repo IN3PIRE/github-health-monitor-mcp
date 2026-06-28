@@ -1,5 +1,5 @@
 import { Octokit } from 'octokit';
-import { ResponseTimeMetrics, PercentileData } from './types';
+import { ResponseTimeMetrics, PercentileData } from './types.js';
 
 export class ResponseTimeAnalyzer {
   private octokit: Octokit;
@@ -83,16 +83,17 @@ export class ResponseTimeAnalyzer {
       let firstResponseTime: Date | null = null;
       
       for (const event of timeline) {
+        const e = event as { event: string; actor?: { login: string }; created_at: string; [key: string]: unknown };
         // Comment by non-author
-        if (event.event === 'commented' && event.actor?.login !== issue.user?.login) {
-          firstResponseTime = new Date(event.created_at);
+        if (e.event === 'commented' && e.actor?.login !== issue.user?.login) {
+          firstResponseTime = new Date(e.created_at);
           break;
         }
         
         // Issue assignment or labeling by maintainer
-        if ((event.event === 'assigned' || event.event === 'labeled') && 
-            event.actor?.login !== issue.user?.login) {
-          firstResponseTime = new Date(event.created_at);
+        if ((e.event === 'assigned' || e.event === 'labeled') && 
+            e.actor?.login !== issue.user?.login) {
+          firstResponseTime = new Date(e.created_at);
           break;
         }
       }
@@ -130,22 +131,23 @@ export class ResponseTimeAnalyzer {
       let firstResponseTime: Date | null = null;
       
       for (const event of timeline) {
+        const e = event as { event: string; actor?: { login: string }; created_at: string; [key: string]: unknown };
         // Review submitted by someone other than PR author
-        if (event.event === 'reviewed' && event.actor?.login !== pr.user?.login) {
-          firstResponseTime = new Date(event.created_at);
+        if (e.event === 'reviewed' && e.actor?.login !== pr.user?.login) {
+          firstResponseTime = new Date(e.created_at);
           break;
         }
         
         // Comment by reviewer/maintainer
-        if (event.event === 'commented' && event.actor?.login !== pr.user?.login) {
-          firstResponseTime = new Date(event.created_at);
+        if (e.event === 'commented' && e.actor?.login !== pr.user?.login) {
+          firstResponseTime = new Date(e.created_at);
           break;
         }
         
         // Assignment or labeling by maintainer
-        if ((event.event === 'assigned' || event.event === 'labeled') && 
-            event.actor?.login !== pr.user?.login) {
-          firstResponseTime = new Date(event.created_at);
+        if ((e.event === 'assigned' || e.event === 'labeled') && 
+            e.actor?.login !== pr.user?.login) {
+          firstResponseTime = new Date(e.created_at);
           break;
         }
       }

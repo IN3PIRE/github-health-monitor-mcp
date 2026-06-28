@@ -1,6 +1,6 @@
 import { GitHub____list_branches____mcp, GitHub____list_pull_requests____mcp, GitHub____search_issues____mcp, GitHub____get_commit____mcp } from './mcp-github-wrapper.js';
 import { collectSecurityAlerts } from './security-monitor.js';
-import { daysBetween } from './utils.js';
+import { deriveHealthFindings } from './health-calculations.js';
 export async function collectHealthData(owner, repo, config) {
     const now = new Date().toISOString();
     const [branches, prs, issues, securityAlerts] = await Promise.all([
@@ -12,7 +12,7 @@ export async function collectHealthData(owner, repo, config) {
         }),
         collectSecurityAlerts(owner, repo, config)
     ]);
-    const staleBranches = [];
+    const branchCommits = [];
     for (const branch of branches) {
         try {
             const commit = await GitHub____get_commit____mcp({
@@ -20,40 +20,31 @@ export async function collectHealthData(owner, repo, config) {
                 repo,
                 sha: branch.commit.sha
             });
-            const daysStale = daysBetween(commit.commit.author.date, now);
-            if (daysStale > config.staleBranchDays) {
-                staleBranches.push({
-                    name: branch.name,
-                    lastCommit: commit.commit.author.date,
-                    daysStale
-                });
+            const authorDate = commit.commit.author?.date ?? commit.commit.committer?.date;
+            if (!authorDate) {
+                console.warn(`Commit ${branch.commit.sha} for branch ${branch.name} has no author or committer date`);
+                continue;
             }
+            branchCommits.push({
+                name: branch.name,
+                lastCommit: authorDate
+            });
         }
         catch (error) {
             console.error(`Failed to get commit for branch ${branch.name}:`, error);
         }
     }
-    const oldPRs = prs
-        .filter(pr => daysBetween(pr.created_at, now) > config.oldPRDays)
-        .map(pr => ({
-        number: pr.number,
-        title: pr.title,
-        daysOpen: daysBetween(pr.created_at, now),
-        author: pr.user.login
-    }));
-    const unresponsiveIssues = issues.items
-        .filter(issue => daysBetween(issue.updated_at, now) > config.unresponsiveIssueDays)
-        .map(issue => ({
-        number: issue.number,
-        title: issue.title,
-        daysSinceUpdate: daysBetween(issue.updated_at, now),
-        assignee: issue.assignee?.login
-    }));
+    const findings = deriveHealthFindings({
+        branchCommits,
+        pullRequests: prs,
+        issues: issues.items,
+        config,
+        now
+    });
     return {
-        staleBranches,
-        oldPRs,
-        unresponsiveIssues,
+        ...findings,
         securityAlerts,
         timestamp: now
     };
 }
+//# sourceMappingURL=health-monitor.js.map
